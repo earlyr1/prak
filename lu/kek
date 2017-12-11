@@ -1,0 +1,73 @@
+void LU_Decomp ( int n, struct Matrix * A, struct Vector *b, struct Vector *x ){// || Ax - b ||
+    struct Vector y;
+    int imax;
+    long double sum = 0;
+    long double max;
+    y.order = n;
+    y.vals = (long double*) calloc(n, sizeof(long double));
+ 
+    (*x).order = n;
+    (*x).vals = (long double *) calloc((*b).order, sizeof(long double));
+ 
+    for ( int k = 0; k < n; k++ ){
+        for ( int i = 0; i < n; i++ ){//проход по столбцу k; построение столбца k матрицы L
+            if ( i >= k ){
+                sum = 0;
+                for ( int j = 0; j < k ; j++ ){
+                    sum = sum + (*A).vals[i][j] * (*A).vals[j][k];
+                }
+                (*A).vals[i][k] = (*A).vals[i][k] - sum ;
+            }
+        }
+// выбор ведущего элемента и его замена
+        max = dAbs((*A).vals[k][k]);
+        imax = k;
+        for ( int i = k; i < n; i++ ){
+            if ( dAbs((*A).vals[i][k]) > max ){
+                imax = i;
+                max = dAbs((*A).vals[i][k]);
+            }
+        }
+        if ( imax != k ){
+            long double * tmp;
+            long double tmpval;
+            tmp = (*A).vals[k];
+            (*A).vals[k] = (*A).vals[imax];
+            (*A).vals[imax] = tmp;
+            tmpval = (*b).vals[k];
+            (*b).vals[k] = (*b).vals[imax];
+            (*b).vals[imax] = tmpval;
+        }
+        for ( int i = 0; i < n; i++ ){//построение строки k матрицы U
+            if ( (*A).vals[k][k] == 0 ){
+                printf("матрица вырождена\n");
+                exit(1);
+            }
+            if ( k < i ){
+                sum = 0;
+                for ( int j = 0; j < k ; j++ ){
+                    sum = sum + (*A).vals[k][j] * (*A).vals[j][i];
+                }
+                (*A).vals[k][i] = ( (*A).vals[k][i] - sum ) / (*A).vals[k][k];
+            }
+        }
+    }
+/* find y = Ux */
+    for ( int i = 0; i < n; i++ ){
+        sum = 0;
+        for ( int j = 0; j < i; j++ ){
+            sum += (*A).vals[i][j] * y.vals[j];
+        }
+        y.vals[i] = ((*b).vals[i] - sum) / (*A).vals[i][i];
+    }
+ 
+/* find x */
+    for ( int i = n - 1; i >= 0; i-- ){
+        sum = 0;
+        for ( int j = n - 1; j >= 0; j-- ){
+            sum += (*A).vals[i][j] * (*x).vals[j];
+        }
+        (*x).vals[i] = (y.vals[i] - sum); // U[i][i] == 1
+    }
+    return;
+}
