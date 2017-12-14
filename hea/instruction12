@@ -1,0 +1,3 @@
+set term jpeg
+set output "picCycles12.jpg"
+plot 'data11.txt' with lines
