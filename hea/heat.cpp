@@ -39,11 +39,11 @@ double a2(double t) {
 
 
 int main(int argc, char ** argv) {
-	int mode = atoi(argv[5]);
+	int mode = atoi(argv[4]); //1 if явная, 0 else
 	M = atoi(argv[1]); // N per x 
 	P = atoi(argv[2]); // N per time	
-	T = atof(argv[3]); // complete time
-	char * edge1 = argv[4]; //0 if values; 1 if derivative
+	T = 1.0; // complete time
+	char * edge1 = argv[3]; //0 if values; 1 if derivative
 	edge = argv[4][0] == 'd'? 1:0;
 	ofstream ofs("data" + to_string(mode) + to_string(edge) + ".txt");
 	dx = 1.0 / M;
@@ -54,7 +54,7 @@ int main(int argc, char ** argv) {
 	for(int i = 0; i <= M; i++) {
 		ans[i] = U(dx * i, T);
 	}
-	if (mode == 1) {
+	if (mode) {
 		
 		double * tmp;
 		for(int i = 0; i <= M; i++) prevLayer[i] = phi(dx * i);	
